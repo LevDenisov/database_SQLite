@@ -18,6 +18,12 @@ public:
            const QChar &gender)
             : name(name), surname(surname), patronymic(patronymic), date_of_birth(date_of_birth), gender(gender) {}
 
+    Person(const QString &&name, const QString &&surname, const QString &&patronymic, const QDate &&date_of_birth,
+           const QChar &gender)
+            : name(name), surname(surname), patronymic(patronymic), date_of_birth(date_of_birth), gender(gender) {}
+
+
+
     [[nodiscard]] QString getName() const {
         return name;
     }
@@ -115,7 +121,7 @@ private:
     }
 
     static QDate randomDate() {
-        return {my_rand(2000, 2070), my_rand(1, 12), my_rand(1, 25)};
+        return {my_rand(2000, 2022), my_rand(1, 12), my_rand(1, 25)};
     }
 };
 

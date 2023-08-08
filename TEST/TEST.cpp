@@ -32,7 +32,13 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<DataBase> db(std::make_unique<DataBase>("myDB"));
 
-    db->optimizationSelectionTable();
+    QTextStream(stdout) << functionExecutionTime([db]() {
+        db->optimizationSelectionTable();
+    }) << '\n';
+
+    QTextStream(stdout) << functionExecutionTime([db]() {
+        db->selectionTable();
+    }) << '\n';
 
     return 0;
 }

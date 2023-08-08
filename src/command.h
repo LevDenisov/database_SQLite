@@ -34,12 +34,12 @@ public:
     }
 };
 
-class OutputAllRecordCmd : public Command {
+class OutputUniqueRecordCmd : public Command {
 public:
-    explicit OutputAllRecordCmd(const std::shared_ptr<DataBase>& db) : Command(db) {}
+    explicit OutputUniqueRecordCmd(const std::shared_ptr<DataBase>& db) : Command(db) {}
 
     void execute() override {
-        db->outputAllRecord();
+        printUniqueRecord(db->outputAllRecord());
     }
 };
 
@@ -57,7 +57,7 @@ public:
     explicit SelectionTableCmd(const std::shared_ptr<DataBase>& db) : Command(db) {}
 
     void execute() override {
-        db->selectionTable();
+        printRecords(db->selectionTable());
     }
 };
 
@@ -79,7 +79,7 @@ public:
     }
 
     void outputRecords() {
-        cmd = std::make_unique<OutputAllRecordCmd>(db);
+        cmd = std::make_unique<OutputUniqueRecordCmd>(db);
         cmd->execute();
     }
 

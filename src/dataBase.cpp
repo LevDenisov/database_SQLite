@@ -47,7 +47,7 @@ void DataBase::createRecord(const Person &person) {
     }
 } // myApp 2 Petr Vasiliy Ivanovich 12/12/2002 w
 
-void DataBase::outputAllRecord() {
+std::unique_ptr<QSqlQuery> DataBase::outputAllRecord() {
     QSqlQuery query("SELECT \n"
                     "    last_name,\n"
                     "    first_name,\n"
@@ -66,19 +66,7 @@ void DataBase::outputAllRecord() {
                     "    first_name,\n"
                     "    patronymic", *db);
 
-    if (!query.isActive()) {
-        QTextStream(stdout) << query.lastError().text() << '\n';
-        return;
-    }
-
-    while (query.next()) {
-        QTextStream(stdout) << query.value(0).toString() << ' '
-            << query.value(1).toString() << ' '
-            << query.value(2).toString() << ' '
-            << query.value(3).toString() << ' '
-            << query.value(4).toString() << ' '
-            << calculateAge(query.value(3)) << '\n';
-    }
+    return std::make_unique<QSqlQuery>(query);
 }
 
 uint DataBase::calculateAge(const QVariant& _dateOfBirth) {
@@ -147,41 +135,52 @@ void DataBase::autoFillingRecord() {
     bulkInsertRecords(people);
 }
 
-void DataBase::selectionTable() {
-    QSqlQuery query("SELECT * FROM People WHERE gender = 'm' AND first_name LIKE 'F%'", *db);
+std::unique_ptr<QSqlQuery> DataBase::selectionTable() {
+    QSqlQuery query("SELECT * FROM People WHERE gender = 'm' AND last_name LIKE 'F%'", *db);
 
-    if (!query.isActive()) {
-        QTextStream(stdout) << query.lastError().text() << '\n';
-        return;
-    }
-
-    while (query.next()) {
-        QTextStream(stdout) << query.value(0).toString() << ' '
-                            << query.value(1).toString() << ' '
-                            << query.value(2).toString() << ' '
-                            << query.value(3).toString() << ' '
-                            << query.value(4).toString() << '\n';
-    }
+    return std::make_unique<QSqlQuery>(query);
 }
 
-void DataBase::optimizationSelectionTable() {
+std::unique_ptr<QSqlQuery> DataBase::optimizationSelectionTable() {
     QSqlQuery createIndexQuery(*db);
     createIndexQuery.exec("CREATE INDEX idx_gender ON People (gender)");
     createIndexQuery.exec("CREATE INDEX idx_first_name ON People (first_name)");
 
-    QSqlQuery query("SELECT * FROM People WHERE gender = 'm' AND first_name LIKE 'F%'", *db);
+    QSqlQuery query("SELECT * FROM People WHERE gender = 'm' AND last_name LIKE 'F%'", *db);
 
-    if (!query.isActive()) {
-        QTextStream(stdout) << query.lastError().text() << '\n';
+    return std::make_unique<QSqlQuery>(query);
+}
+
+void printUniqueRecord(std::unique_ptr<QSqlQuery> query) {
+    if (!query->isActive()) {
+        QTextStream(stdout) << query->lastError().text() << '\n';
         return;
     }
 
-    while (query.next()) {
-        QTextStream(stdout) << query.value(0).toString() << ' '
-                            << query.value(1).toString() << ' '
-                            << query.value(2).toString() << ' '
-                            << query.value(3).toString() << ' '
-                            << query.value(4).toString() << '\n';
+    uint sizeColumn = query->record().count();
+
+    while (query->next()) {
+        for (int i = 0; i < sizeColumn; i++) {
+            QTextStream(stdout) << query->value(i).toString() << ' ';
+        }
+
+        QTextStream(stdout) << DataBase::calculateAge(query->value(3)) << '\n';
+    }
+}
+
+void printRecords(std::unique_ptr<QSqlQuery> query) {
+    if (!query->isActive()) {
+        QTextStream(stdout) << query->lastError().text() << '\n';
+        return;
     }
 
+    uint sizeColumn = query->record().count();
+
+    while (query->next()) {
+        for (int i = 0; i < sizeColumn; i++) {
+            QTextStream(stdout) << query->value(i).toString() << ' ';
+        }
+
+        QTextStream(stdout) << '\n';
+    }
 }

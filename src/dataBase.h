@@ -14,8 +14,6 @@ class DataBase {
 
     void bulkInsertRecords(const QVector<Person> &people);
 
-    uint calculateAge(const QVariant &_dateOfBirth);
-
 public:
     explicit DataBase(const QString &name);
 
@@ -25,14 +23,19 @@ public:
 
     void createRecord(const Person &person);
 
-    void outputAllRecord();
+    std::unique_ptr<QSqlQuery> outputAllRecord();
 
     void autoFillingRecord();
 
-    void selectionTable();
+    std::unique_ptr<QSqlQuery> selectionTable();
 
-    void optimizationSelectionTable();
+    std::unique_ptr<QSqlQuery> optimizationSelectionTable();
+
+    static uint calculateAge(const QVariant &_dateOfBirth);
 };
 
+void printUniqueRecord(std::unique_ptr<QSqlQuery> query);
+
+void printRecords(std::unique_ptr<QSqlQuery> query);
 
 #endif //SQLREQUESTINCONSOLEAPPQT6_DATABASE_H
