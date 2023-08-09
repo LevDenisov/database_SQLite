@@ -21,6 +21,7 @@ void processCommand(const QString& input, Invoker& inv) {
 
     if (!ok) {
         QTextStream(stdout) << "This command does not exist\n";
+        return;
     }
 
     switch (command) {
